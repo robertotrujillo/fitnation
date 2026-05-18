@@ -30,7 +30,7 @@ serve(async (req) => {
       );
     }
 
-    const { prompt, userData } = body;
+    const { prompt, userData, file } = body;
 
     if (!prompt || !userData) {
       return new Response(
@@ -44,25 +44,42 @@ serve(async (req) => {
       throw new Error("GEMINI_API_KEY no está configurada en los Secrets de Supabase");
     }
 
-    // Configuramos la personalidad de la IA
-    const systemInstruction = `Eres FitCoach, el asistente experto de FitNation. 
+    // Instrucción para guiar a Gemini en el análisis y obligar a centrarse en el fitness/salud
+    const systemInstruction = `Eres FitCoach, el asistente experto en nutrición, dietas y entrenamiento físico de FitNation.
     El usuario se llama ${userData.username || 'Atleta'} y su objetivo es ${userData.objetivo || 'mejorar su salud'}.
-    Responde de forma profesional, motivadora y basada en datos científicos. Sé breve y directo.`
+    
+    CRITICAL SAFETY RULES:
+    1. Si el usuario te proporciona un archivo (imagen, PDF o texto) o te pregunta algo, debes verificar rigurosamente que esté relacionado con:
+       - Nutrición, alimentación, dietas, recetas saludables o suplementación deportiva.
+       - Rutinas de ejercicio, entrenamientos, acondicionamiento físico, anatomía deportiva o salud física.
+    2. Si el archivo o la consulta NO tiene relación con estos temas (por ejemplo: fotos de paisajes no relacionados, capturas de chats personales ajenos al deporte, documentos sobre finanzas, programación, política, tareas escolares no deportivas, etc.), debes rechazar el análisis de forma muy amable e inspiradora, indicando que como FitCoach solo estás entrenado para optimizar sus rutinas de entrenamiento y planes de alimentación.
+    3. Responde de forma profesional, clara, motivadora y basada en datos científicos. Sé breve y estructurado.`
+
+    // Estructura los contenidos para la API de Gemini
+    const parts = [
+      { text: `${systemInstruction}\n\nPregunta del usuario: ${prompt}` }
+    ];
+
+    if (file && file.base64 && file.mimeType) {
+      parts.push({
+        inlineData: {
+          mimeType: file.mimeType,
+          data: file.base64
+        }
+      });
+    }
 
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        contents: [{
-          parts: [{ text: `${systemInstruction}\n\nPregunta del usuario: ${prompt}` }]
-        }]
+        contents: [{ parts }]
       })
     })
 
     const data = await response.json()
 
     if (!response.ok) {
-      // Devolvemos el error de Google pero con status 200 para que el chat lo muestre
       return new Response(JSON.stringify({ error: data.error?.message || "Error en Gemini" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200

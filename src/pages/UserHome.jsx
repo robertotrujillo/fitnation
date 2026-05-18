@@ -11,6 +11,7 @@ import { useAuth } from '../context/AuthContext';
 import MuscleProgressModal from '../components/profile/MuscleProgressModal';
 import GymMapModal from '../components/home/GymMapModal';
 import FitCoachModal from '../components/home/FitCoachModal';
+import FitFriendsModal from '../components/home/FitFriendsModal';
 import { useTranslation } from 'react-i18next';
 import './UserHome.css';
 
@@ -21,7 +22,6 @@ const UserHome = () => {
     const [textoNuevaPublicacion, setTextoNuevaPublicacion] = useState('');
     const [feedTab, setFeedTab] = useState('para-ti');
     const [siguiendoIds, setSiguiendoIds] = useState([]);
-    const [contactos, setContactos] = useState([]);
 
     const ads = [
         {
@@ -47,6 +47,7 @@ const UserHome = () => {
     const [modalEntreno, setModalEntreno] = useState(false);
     const [modalGyms, setModalGyms] = useState(false);
     const [modalCoach, setModalCoach] = useState(false);
+    const [modalAmigos, setModalAmigos] = useState(false);
 
     // Estados para subida de fotos
     const [imagenPublicacion, setImagenPublicacion] = useState(null);
@@ -97,14 +98,6 @@ const UserHome = () => {
             }));
 
             setPublicaciones(postsConMetadatos);
-
-            // Cargar los perfiles reales de los contactos (los que sigo)
-            if (mSigo.length > 0) {
-                const perfilesContactos = await Promise.all(
-                    mSigo.map(id => servicioPerfil.obtenerPerfil(id))
-                );
-                setContactos(perfilesContactos.filter(Boolean));
-            }
 
         };
         cargarDatos();
@@ -359,21 +352,15 @@ const UserHome = () => {
                         <span className="fw-bold">{usuario?.user_metadata?.nombre_usuario || usuario?.email?.split('@')[0] || 'Cliente'}</span>
                     </div>
 
-                    <a href="#" className="sidebar-nav-item">
+                    <button className="sidebar-nav-item border-0 bg-transparent text-start w-100" onClick={() => setModalAmigos(true)}>
                         <i className="bi bi-people-fill text-primary"></i> {t('userHome.friends')}
-                    </a>
+                    </button>
                     <button className="sidebar-nav-item border-0 bg-transparent text-start w-100" onClick={() => setModalEntreno(true)}>
                         <i className="bi bi-fire text-danger"></i> {t('userHome.muscle_progress')}
                     </button>
                     <button className="sidebar-nav-item border-0 bg-transparent text-start w-100" onClick={() => setModalGyms(true)}>
                         <i className="bi bi-geo-alt-fill text-success"></i> {t('userHome.gyms')}
                     </button>
-                    <a href="#" className="sidebar-nav-item">
-                        <i className="bi bi-calendar-event-fill text-danger"></i> {t('userHome.events')}
-                    </a>
-                    <a href="#" className="sidebar-nav-item">
-                        <i className="bi bi-shop text-info"></i> {t('userHome.gym_shop')}
-                    </a>
                     <button className="sidebar-nav-item border-0 bg-transparent text-start w-100" onClick={() => setModalCoach(true)}>
                         <i className="bi bi-robot" style={{ color: '#0d6efd' }}></i> {t('userHome.fitcoach')}
                         <span className="badge bg-primary ms-2 animate-pulse" style={{ fontSize: '0.6rem' }}>IA</span>
@@ -524,27 +511,6 @@ const UserHome = () => {
                             ))}
                         </div>
                     </div>
-
-                    <h6 className="fw-bold mb-3" style={{ color: 'var(--fn-text-muted)' }}>{t('userHome.contacts')}</h6>
-                    {contactos.length > 0 ? (
-                        contactos.map(contacto => (
-                            <Link to={`/profile/${contacto.id}`} key={contacto.id} className="text-decoration-none d-flex align-items-center gap-3 mb-3 p-2 rounded" style={{ cursor: 'pointer', color: 'var(--fn-text-main)' }}>
-                                <div className="position-relative">
-                                    <div className="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style={{ width: '36px', height: '36px', backgroundColor: 'var(--fn-avatar-bg)', color: 'var(--fn-avatar-text)', fontWeight: 'bold' }}>
-                                        {contacto.avatar_url ? (
-                                            <img src={contacto.avatar_url} alt="Avatar" className="w-100 h-100 rounded-circle object-fit-cover" />
-                                        ) : (
-                                            (contacto.username || 'U').charAt(0).toUpperCase()
-                                        )}
-                                    </div>
-                                    <div className="position-absolute bg-success rounded-circle" style={{ width: '10px', height: '10px', bottom: 0, right: 0, border: '2px solid var(--fn-card-bg)' }}></div>
-                                </div>
-                                <span className="fw-bold small">{contacto.username || 'Usuario'}</span>
-                            </Link>
-                        ))
-                    ) : (
-                        <p className="small" style={{ color: 'var(--fn-text-muted)' }}>{t('userHome.no_contacts')}</p>
-                    )}
                 </div>
             </div>
 
@@ -576,6 +542,12 @@ const UserHome = () => {
                 <FitCoachModal 
                     usuario={usuario} 
                     onClose={() => setModalCoach(false)} 
+                />
+            )}
+            {modalAmigos && (
+                <FitFriendsModal 
+                    usuario={usuario} 
+                    onClose={() => setModalAmigos(false)} 
                 />
             )}
         </div >

@@ -3,12 +3,21 @@ import { servicioPublicaciones } from '../services/postService';
 import { servicioPerfil } from '../services/profileService';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../context/LanguageContext';
 import { useNavigate, Link } from 'react-router-dom';
 import './AdminDashboard.css';
+
+const LANGUAGES = [
+    { code: 'es', flag: '🇪🇸', labelKey: 'settings.lang_es' },
+    { code: 'en', flag: '🇬🇧', labelKey: 'settings.lang_en' },
+];
 
 const AdminDashboard = () => {
     const { usuario, cerrarSesion } = useAuth();
     const { theme, toggleTheme } = useTheme();
+    const { t } = useTranslation();
+    const { language, changeLanguage } = useLanguage();
     const navigate = useNavigate();
 
     const [publicaciones, setPublicaciones] = useState([]);
@@ -151,44 +160,44 @@ const AdminDashboard = () => {
                     <li className="menu-item">
                         <a href="#" className={`menu-link ${vistaActual === 'panel' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); setVistaActual('panel'); }}>
                             <i className="bi bi-speedometer2"></i>
-                            <span>Panel Principal</span>
+                            <span>{t('admin.sidebar.dashboard')}</span>
                         </a>
                     </li>
                     <li className="menu-item">
                         <a href="#" className={`menu-link ${vistaActual === 'usuarios' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); setVistaActual('usuarios'); }}>
                             <i className="bi bi-people"></i>
-                            <span>Usuarios</span>
+                            <span>{t('admin.sidebar.users')}</span>
                         </a>
                     </li>
                     <li className="menu-item">
                         <a href="#" className="menu-link">
                             <i className="bi bi-graph-up"></i>
-                            <span>Estadísticas</span>
+                            <span>{t('admin.sidebar.stats')}</span>
                         </a>
                     </li>
                     <li className="menu-item">
                         <a href="#" className={`menu-link ${vistaActual === 'publicaciones' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); setVistaActual('publicaciones'); }}>
                             <i className="bi bi-newspaper"></i>
-                            <span>Publicaciones</span>
+                            <span>{t('admin.sidebar.posts')}</span>
                         </a>
                     </li>
                     <li className="menu-item">
                         <a href="#" className="menu-link">
                             <i className="bi bi-award"></i>
-                            <span>Logros</span>
+                            <span>{t('admin.sidebar.achievements')}</span>
                         </a>
                     </li>
                     <li className="menu-item">
                         <a href="#" className={`menu-link ${vistaActual === 'configuracion' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); setVistaActual('configuracion'); }}>
                             <i className="bi bi-gear-fill"></i>
-                            <span>Configuración</span>
+                            <span>{t('admin.sidebar.settings')}</span>
                         </a>
                     </li>
                 </ul>
 
                 <div className="logout-btn-wrapper">
                     <button onClick={manejarCerrarSesion} className="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2" style={{ fontWeight: '600' }}>
-                        <i className="bi bi-box-arrow-left"></i> Cerrar sesión
+                        <i className="bi bi-box-arrow-left"></i> {t('admin.sidebar.logout')}
                     </button>
                 </div>
             </aside>
@@ -199,32 +208,32 @@ const AdminDashboard = () => {
                         <div className="container-fluid p-0">
 
                             <div className="page-header mb-4">
-                                <h2>Centro de mando de Fitnation</h2>
-                                <p>Panel de control de la Comunidad</p>
+                                <h2>{t('admin.dashboard.title')}</h2>
+                                <p>{t('admin.dashboard.subtitle')}</p>
                             </div>
 
                             <div className="row g-4 mb-5">
                                 <div className="col-md-3">
                                     <div className="stat-card" style={{ borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-                                        <div className="stat-label">USUARIOS REGISTRADOS</div>
+                                        <div className="stat-label">{t('admin.dashboard.registered_users')}</div>
                                         <div className="stat-value">{stats.usuariosActivos}</div>
                                     </div>
                                 </div>
                                 <div className="col-md-3">
                                     <div className="stat-card" style={{ borderLeftColor: '#0dcaf0', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-                                        <div className="stat-label text-info">NUEVOS USUARIOS (semanales)</div>
+                                        <div className="stat-label text-info">{t('admin.dashboard.new_users')}</div>
                                         <div className="stat-value">{stats.nuevosHoy}</div>
                                     </div>
                                 </div>
                                 <div className="col-md-3">
                                     <div className="stat-card" style={{ borderLeftColor: '#dc3545', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-                                        <div className="stat-label text-danger">REPORTES PENDIENTES</div>
+                                        <div className="stat-label text-danger">{t('admin.dashboard.pending_reports')}</div>
                                         <div className="stat-value">{stats.reportesPendientes}</div>
                                     </div>
                                 </div>
                                 <div className="col-md-3">
                                     <div className="stat-card" style={{ borderLeftColor: '#ffc107', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-                                        <div className="stat-label text-warning">RETOS ACTIVOS</div>
+                                        <div className="stat-label text-warning">{t('admin.dashboard.active_challenges')}</div>
                                         <div className="stat-value">{stats.retosActivos}</div>
                                     </div>
                                 </div>
@@ -233,7 +242,7 @@ const AdminDashboard = () => {
 
                         <div className="card shadow-sm mb-5" style={{ backgroundColor: 'var(--fn-card-bg)', border: '1px solid var(--fn-border)' }}>
                             <div className="card-header border-0 pt-4 px-4" style={{ backgroundColor: 'transparent' }}>
-                                <h5 className="card-title fw-bold" style={{ color: 'var(--fn-text-main)' }}>Usuarios registrados</h5>
+                                <h5 className="card-title fw-bold" style={{ color: 'var(--fn-text-main)' }}>{t('admin.dashboard.registered_users_chart')}</h5>
                             </div>
                             <div className="card-body px-4 pb-4">
                                 <div className="chart-container" style={{ height: '150px' }}>
@@ -266,22 +275,22 @@ const AdminDashboard = () => {
                         <div className="row">
                             <div className="col-lg-5 mb-4 mb-lg-0">
                                 <div className="card shadow-sm p-4" style={{ borderRadius: '15px', backgroundColor: 'var(--fn-card-bg)', border: '1px solid var(--fn-border)' }}>
-                                    <h5 className="mb-3 fw-bold" style={{ color: 'var(--fn-text-main)' }}><i className="bi bi-megaphone-fill text-primary me-2"></i> Anuncios Globales</h5>
-                                    <p className="text-muted small mb-4">Envía una notificación al feed de todos los usuarios de la plataforma.</p>
+                                    <h5 className="mb-3 fw-bold" style={{ color: 'var(--fn-text-main)' }}><i className="bi bi-megaphone-fill text-primary me-2"></i> {t('admin.dashboard.global_announcements')}</h5>
+                                    <p className="text-muted small mb-4">{t('admin.dashboard.announcements_desc')}</p>
 
                                     <form onSubmit={manejarCrearAnuncio}>
                                         <div className="mb-3">
                                             <textarea
                                                 className="form-control border-0"
                                                 rows="4"
-                                                placeholder="Escribe el anuncio para la comunidad..."
+                                                placeholder={t('admin.dashboard.announcement_placeholder')}
                                                 value={textoNuevoAnuncio}
                                                 onChange={(e) => setTextoNuevoAnuncio(e.target.value)}
                                                 style={{ borderRadius: '10px', resize: 'none', backgroundColor: 'var(--fn-input-bg)', color: 'var(--fn-text-main)' }}
                                             ></textarea>
                                         </div>
                                         <button type="submit" className="btn btn-primary w-100 fw-bold d-flex align-items-center justify-content-center gap-2" style={{ borderRadius: '10px' }}>
-                                            <i className="bi bi-send-fill"></i> Lanzar Anuncio
+                                            <i className="bi bi-send-fill"></i> {t('admin.dashboard.launch_announcement')}
                                         </button>
                                     </form>
                                 </div>
@@ -290,8 +299,8 @@ const AdminDashboard = () => {
                             <div className="col-lg-7">
                                 <div className="card shadow-sm p-4" style={{ borderRadius: '15px', backgroundColor: 'var(--fn-card-bg)', border: '1px solid var(--fn-border)' }}>
                                     <div className="d-flex justify-content-between align-items-center mb-4">
-                                        <h5 className="mb-0 fw-bold" style={{ color: 'var(--fn-text-main)' }}><i className="bi bi-shield-lock-fill text-danger me-2"></i> Bandeja de Moderación</h5>
-                                        <span className="badge bg-danger rounded-pill">Reportes Pendientes</span>
+                                        <h5 className="mb-0 fw-bold" style={{ color: 'var(--fn-text-main)' }}><i className="bi bi-shield-lock-fill text-danger me-2"></i> {t('admin.dashboard.moderation_inbox')}</h5>
+                                        <span className="badge bg-danger rounded-pill">{t('admin.dashboard.pending_reports_badge')}</span>
                                     </div>
 
                                     <div className="feed-list" style={{ maxHeight: '600px', overflowY: 'auto', paddingRight: '10px' }}>
@@ -309,13 +318,13 @@ const AdminDashboard = () => {
                                                     <div className="mb-3 pb-2 border-bottom border-danger border-opacity-25">
                                                         <div className="d-flex align-items-center mb-1">
                                                             <i className="bi bi-exclamation-triangle-fill text-danger me-2"></i>
-                                                            <span className="fw-bold text-danger small">Reporte generado por @{autorReporte}</span>
+                                                            <span className="fw-bold text-danger small">{t('admin.dashboard.report_generated_by', { user: autorReporte })}</span>
                                                         </div>
                                                         <div className="rounded p-2 small mt-2 border border-secondary border-opacity-25" style={{ backgroundColor: 'var(--fn-input-bg)', color: 'var(--fn-text-main)' }}>
-                                                            <span className="fw-bold">Motivo:</span> {reporte.reason}
+                                                            <span className="fw-bold">{t('admin.dashboard.reason')}</span> {reporte.reason}
                                                         </div>
                                                         <div className="text-muted small mt-1 text-end" style={{ fontSize: '0.75rem' }}>
-                                                            Fecha del reporte: {new Date(reporte.created_at).toLocaleString()}
+                                                            {t('admin.dashboard.report_date', { date: new Date(reporte.created_at).toLocaleString() })}
                                                         </div>
                                                     </div>
 
@@ -350,7 +359,7 @@ const AdminDashboard = () => {
                                                             className="btn btn-sm btn-outline-secondary fw-bold"
                                                             onClick={() => manejarDesestimarReporte(reporte.id)}
                                                         >
-                                                            <i className="bi bi-check-circle-fill me-1"></i> Desestimar Reporte
+                                                            <i className="bi bi-check-circle-fill me-1"></i> {t('admin.dashboard.dismiss_report')}
                                                         </button>
                                                         <button
                                                             className="btn btn-sm btn-danger fw-bold shadow-sm"
@@ -360,7 +369,7 @@ const AdminDashboard = () => {
                                                             {eliminandoId === publicacion.id ? (
                                                                 <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                                                             ) : (
-                                                                <><i className="bi bi-trash3-fill me-1"></i> Eliminar Post</>
+                                                                <><i className="bi bi-trash3-fill me-1"></i> {t('admin.dashboard.delete_post')}</>
                                                             )}
                                                         </button>
                                                     </div>
@@ -369,8 +378,8 @@ const AdminDashboard = () => {
                                         }) : (
                                             <div className="text-center text-muted p-5">
                                                 <i className="bi bi-shield-check text-success" style={{ fontSize: '4rem' }}></i>
-                                                <h5 className="mt-3 fw-bold" style={{ color: 'var(--fn-text-main)' }}>Todo en orden</h5>
-                                                <p>No hay reportes pendientes de revisión.</p>
+                                                <h5 className="mt-3 fw-bold" style={{ color: 'var(--fn-text-main)' }}>{t('admin.dashboard.all_clear_title')}</h5>
+                                                <p>{t('admin.dashboard.all_clear_desc')}</p>
                                             </div>
                                         )}
                                     </div>
@@ -383,8 +392,8 @@ const AdminDashboard = () => {
                 {vistaActual === 'usuarios' && (
                     <div className="container-fluid p-0">
                         <div className="page-header mb-4">
-                            <h2>Gestión de Usuarios</h2>
-                            <p>Administra los miembros de la comunidad Fitnation</p>
+                            <h2>{t('admin.user_management.title')}</h2>
+                            <p>{t('admin.user_management.subtitle')}</p>
                         </div>
 
                         <div className="card shadow-sm p-4 mb-4" style={{ borderRadius: '15px', backgroundColor: 'var(--fn-card-bg)', border: '1px solid var(--fn-border)' }}>
@@ -396,13 +405,13 @@ const AdminDashboard = () => {
                                     <input
                                         type="text"
                                         className="form-control border-0"
-                                        placeholder="Buscar por nombre de usuario..."
+                                        placeholder={t('admin.user_management.search_placeholder')}
                                         value={busquedaUsuarios}
                                         onChange={(e) => setBusquedaUsuarios(e.target.value)}
                                         style={{ boxShadow: 'none', backgroundColor: 'var(--fn-input-bg)', color: 'var(--fn-text-main)' }}
                                     />
                                     <button className="btn btn-primary px-4" type="submit" style={{ borderRadius: '0 10px 10px 0' }}>
-                                        Buscar
+                                        {t('admin.user_management.search_btn')}
                                     </button>
                                 </div>
                             </form>
@@ -413,11 +422,11 @@ const AdminDashboard = () => {
                                 <table className="table table-hover align-middle mb-0" style={{ color: 'var(--fn-text-main)' }}>
                                     <thead style={{ backgroundColor: 'var(--fn-input-bg)', color: 'var(--fn-text-main)' }}>
                                         <tr>
-                                            <th scope="col" className="ps-4 border-0 rounded-start">Usuario</th>
-                                            <th scope="col" className="border-0">Nombre Completo</th>
-                                            <th scope="col" className="border-0">Biografía</th>
-                                            <th scope="col" className="border-0">Fecha de Registro</th>
-                                            <th scope="col" className="text-end pe-4 border-0 rounded-end">Acciones</th>
+                                            <th scope="col" className="ps-4 border-0 rounded-start">{t('admin.user_management.table_user')}</th>
+                                            <th scope="col" className="border-0">{t('admin.user_management.table_name')}</th>
+                                            <th scope="col" className="border-0">{t('admin.user_management.table_bio')}</th>
+                                            <th scope="col" className="border-0">{t('admin.user_management.table_date')}</th>
+                                            <th scope="col" className="text-end pe-4 border-0 rounded-end">{t('admin.user_management.table_actions')}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -459,7 +468,7 @@ const AdminDashboard = () => {
                                                         <Link 
                                                             to={`/profile/${u.id}`} 
                                                             className="btn btn-sm btn-outline-secondary me-2" 
-                                                            title="Ver Perfil"
+                                                            title={t('admin.user_management.view_profile_tooltip')}
                                                         >
                                                             <i className="bi bi-eye"></i>
                                                         </Link>
@@ -471,7 +480,7 @@ const AdminDashboard = () => {
                                             <tr>
                                                 <td colSpan="5" className="text-center py-5 text-muted">
                                                     <i className="bi bi-search fs-2 mb-3 d-block"></i>
-                                                    No se encontraron usuarios
+                                                    {t('admin.user_management.no_users_found')}
                                                 </td>
                                             </tr>
                                         )}
@@ -485,8 +494,8 @@ const AdminDashboard = () => {
                 {vistaActual === 'publicaciones' && (
                     <div className="container-fluid p-0">
                         <div className="page-header mb-4">
-                            <h2>Gestión de Publicaciones</h2>
-                            <p>Explora y administra todas las publicaciones de la comunidad</p>
+                            <h2>{t('admin.post_management.title')}</h2>
+                            <p>{t('admin.post_management.subtitle')}</p>
                         </div>
 
                         <div className="row g-4">
@@ -529,7 +538,7 @@ const AdminDashboard = () => {
                                                     {eliminandoId === post.id ? (
                                                         <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                                                     ) : (
-                                                        <><i className="bi bi-trash3-fill me-2"></i> Eliminar Publicación</>
+                                                        <><i className="bi bi-trash3-fill me-2"></i> {t('admin.post_management.delete_post_btn')}</>
                                                     )}
                                                 </button>
                                             </div>
@@ -539,8 +548,8 @@ const AdminDashboard = () => {
                             }) : (
                                 <div className="col-12 text-center text-muted p-5">
                                     <i className="bi bi-journal-x fs-1 mb-3 d-block"></i>
-                                    <h5 className="mt-3 fw-bold" style={{ color: 'var(--fn-text-main)' }}>No hay publicaciones</h5>
-                                    <p>Aún no se ha publicado nada en la plataforma.</p>
+                                    <h5 className="mt-3 fw-bold" style={{ color: 'var(--fn-text-main)' }}>{t('admin.post_management.no_posts_title')}</h5>
+                                    <p>{t('admin.post_management.no_posts_desc')}</p>
                                 </div>
                             )}
                         </div>
@@ -550,19 +559,19 @@ const AdminDashboard = () => {
                 {vistaActual === 'configuracion' && (
                     <div className="container-fluid p-0">
                         <div className="page-header mb-4">
-                            <h2>Configuración</h2>
-                            <p>Preferencias del administrador</p>
+                            <h2>{t('admin.settings.title')}</h2>
+                            <p>{t('admin.settings.subtitle')}</p>
                         </div>
 
                         <div className="row justify-content-center mt-5">
                             <div className="col-12 col-md-8 col-lg-6">
                                 <div className="card shadow-sm border-0 rounded-4" style={{ backgroundColor: 'var(--fn-card-bg)', border: '1px solid var(--fn-border)' }}>
                                     <div className="card-header bg-transparent border-bottom-0 pt-4 pb-0 text-center">
-                                        <h3 className="fw-bold mb-0" style={{ color: 'var(--fn-text-main)' }}>Configuración del Panel</h3>
+                                        <h3 className="fw-bold mb-0" style={{ color: 'var(--fn-text-main)' }}>{t('admin.settings.title')}</h3>
                                     </div>
 
                                     <div className="card-body p-4">
-                                        <h5 className="fw-bold mb-3" style={{ color: 'var(--fn-text-muted)' }}>Apariencia</h5>
+                                        <h5 className="fw-bold mb-3" style={{ color: 'var(--fn-text-muted)' }}>{t('admin.settings.appearance')}</h5>
 
                                         <div className="d-flex align-items-center justify-content-between p-3 rounded-3 mb-4" style={{ backgroundColor: 'var(--fn-input-bg)', border: '1px solid var(--fn-border)' }}>
                                             <div className="d-flex align-items-center gap-3">
@@ -574,8 +583,8 @@ const AdminDashboard = () => {
                                                     )}
                                                 </div>
                                                 <div>
-                                                    <h6 className="mb-0 fw-bold" style={{ color: 'var(--fn-text-main)' }}>Modo Oscuro</h6>
-                                                    <small style={{ color: 'var(--fn-text-muted)' }}>Ajusta la apariencia visual de FitNation</small>
+                                                    <h6 className="mb-0 fw-bold" style={{ color: 'var(--fn-text-main)' }}>{t('admin.settings.dark_mode')}</h6>
+                                                    <small style={{ color: 'var(--fn-text-muted)' }}>{t('admin.settings.dark_mode_desc')}</small>
                                                 </div>
                                             </div>
                                             <div className="form-check form-switch fs-4 mb-0">
@@ -591,23 +600,56 @@ const AdminDashboard = () => {
                                             </div>
                                         </div>
 
+                                        {/* Selector de idioma */}
+                                        <div className="p-3 rounded-3 mb-4" style={{ backgroundColor: 'var(--fn-input-bg)', border: '1px solid var(--fn-border)' }}>
+                                            <div className="d-flex align-items-center gap-3 mb-3">
+                                                <div className="rounded-circle d-flex align-items-center justify-content-center bg-secondary-subtle" style={{ width: '40px', height: '40px', fontSize: '1.2rem' }}>
+                                                    🌐
+                                                </div>
+                                                <div>
+                                                    <h6 className="mb-0 fw-bold" style={{ color: 'var(--fn-text-main)' }}>{t('settings.language')}</h6>
+                                                    <small style={{ color: 'var(--fn-text-muted)' }}>{t('settings.language_desc')}</small>
+                                                </div>
+                                            </div>
+                                            <div className="d-flex gap-2">
+                                                {LANGUAGES.map(({ code, flag, labelKey }) => (
+                                                    <button
+                                                        key={code}
+                                                        onClick={() => changeLanguage(code)}
+                                                        className={`btn d-flex align-items-center gap-2 rounded-pill px-3 py-2 fw-semibold flex-grow-1 justify-content-center ${
+                                                            language === code
+                                                                ? 'btn-primary shadow-sm'
+                                                                : 'btn-outline-secondary'
+                                                        }`}
+                                                        style={{ transition: 'all 0.2s ease', border: language === code ? 'none' : '1px solid var(--fn-border)' }}
+                                                    >
+                                                        <span style={{ fontSize: '1.3rem', lineHeight: 1 }}>{flag}</span>
+                                                        <span style={{ color: language === code ? '#fff' : 'var(--fn-text-main)' }}>{t(labelKey)}</span>
+                                                        {language === code && (
+                                                            <i className="bi bi-check-circle-fill ms-1" style={{ fontSize: '0.85rem', color: '#fff' }}></i>
+                                                        )}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
                                         <hr style={{ borderColor: 'var(--fn-border)' }} />
 
                                         <div className="mt-4">
-                                            <h5 className="fw-bold mb-3" style={{ color: 'var(--fn-text-muted)' }}>Cuenta</h5>
+                                            <h5 className="fw-bold mb-3" style={{ color: 'var(--fn-text-muted)' }}>{t('admin.settings.account')}</h5>
 
                                             <div className="list-group list-group-flush">
                                                 <div className="list-group-item px-0 d-flex justify-content-between align-items-center bg-transparent" style={{ borderColor: 'var(--fn-border)' }}>
-                                                    <span style={{ color: 'var(--fn-text-main)' }}>Email asociado</span>
+                                                    <span style={{ color: 'var(--fn-text-main)' }}>{t('admin.settings.email_label')}</span>
                                                     <span style={{ color: 'var(--fn-text-muted)' }}>{usuario?.email}</span>
                                                 </div>
                                                 <div className="list-group-item px-0 d-flex justify-content-between align-items-center bg-transparent" style={{ borderColor: 'var(--fn-border)' }}>
-                                                    <span style={{ color: 'var(--fn-text-main)' }}>Estado</span>
-                                                    <span className="badge bg-success">Activo (Admin)</span>
+                                                    <span style={{ color: 'var(--fn-text-main)' }}>{t('admin.settings.status')}</span>
+                                                    <span className="badge bg-success">{t('admin.settings.status_active')}</span>
                                                 </div>
                                                 <div className="list-group-item px-0 d-flex justify-content-between align-items-center bg-transparent border-bottom-0 pb-0 pt-4 mt-2">
                                                     <button onClick={manejarCerrarSesion} className="btn btn-danger w-100 rounded-pill fw-bold shadow-sm">
-                                                        <i className="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
+                                                        <i className="bi bi-box-arrow-right me-2"></i> {t('admin.settings.logout_btn')}
                                                     </button>
                                                 </div>
                                             </div>

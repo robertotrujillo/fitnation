@@ -113,6 +113,25 @@ const resources = {
         "image_too_large": "La imagen es demasiado grande (máx. 5MB).",
         "format_error": "Formato no soportado. Usa JPG, PNG, WebP, MP4 o WebM."
       },
+      "friends": {
+        "title": "Amigos",
+        "tab_friends": "Mis Amigos",
+        "tab_following": "Siguiendo",
+        "tab_followers": "Seguidores",
+        "tab_discover": "Descubrir",
+        "mutual_badge": "Amigo Mutuo ⚡",
+        "follow_back": "Seguir también",
+        "unfollow": "Dejar de seguir",
+        "follow": "Seguir",
+        "view_profile": "Ver Perfil",
+        "search_placeholder": "Buscar atletas por nombre de usuario...",
+        "no_friends": "Aún no tienes amigos mutuos. ¡Sigue de vuelta a tus seguidores o descubre nuevos atletas!",
+        "no_following": "Aún no estás siguiendo a ningún atleta.",
+        "no_followers": "Aún no tienes seguidores. ¡Comparte tus entrenos y posts para darte a conocer!",
+        "no_discover": "¡Estás al día! Sigues a todos los atletas registrados.",
+        "common_goal": "🎯 Mismo Objetivo: {{goal}}",
+        "active_now": "Activo ahora"
+      },
       "createPost": {
         "placeholder": "¿Qué estás pensando, {{name}}?",
         "photo": "Foto",
@@ -266,7 +285,11 @@ const resources = {
         "error_internal": "⚠️ Lo siento, he tenido un pequeño problema interno analizando tu solicitud. ¿Podrías volver a intentarlo en unos momentos?",
         "error_network": "❌ Vaya, parece que hay problemas para comunicar con mis servidores. Comprueba tu conexión o inténtalo más tarde.",
         "delete_tooltip": "Borrar conversación",
-        "close_tooltip": "Cerrar"
+        "close_tooltip": "Cerrar",
+        "format_error": "Formato no soportado. Usa imágenes (PNG, JPG, WEBP), PDFs, Excels (.xlsx, .xls) o archivos TXT.",
+        "file_too_large": "El archivo es demasiado grande (máx. 5MB).",
+        "file_attached": "Archivo adjunto",
+        "attach_file": "Adjuntar archivo"
       },
       "gymMap": {
         "title": "Gimnasios Cercanos"
@@ -290,6 +313,71 @@ const resources = {
         "arms": "Brazos",
         "legs": "Piernas",
         "core": "Core / Abs"
+      },
+      "admin": {
+        "sidebar": {
+          "dashboard": "Panel Principal",
+          "users": "Usuarios",
+          "stats": "Estadísticas",
+          "posts": "Publicaciones",
+          "achievements": "Logros",
+          "settings": "Configuración",
+          "logout": "Cerrar sesión"
+        },
+        "dashboard": {
+          "title": "Centro de mando de Fitnation",
+          "subtitle": "Panel de control de la Comunidad",
+          "registered_users": "USUARIOS REGISTRADOS",
+          "new_users": "NUEVOS USUARIOS (semanales)",
+          "pending_reports": "REPORTES PENDIENTES",
+          "active_challenges": "RETOS ACTIVOS",
+          "registered_users_chart": "Usuarios registrados",
+          "global_announcements": "Anuncios Globales",
+          "announcements_desc": "Envía una notificación al feed de todos los usuarios de la plataforma.",
+          "announcement_placeholder": "Escribe el anuncio para la comunidad...",
+          "launch_announcement": "Lanzar Anuncio",
+          "moderation_inbox": "Bandeja de Moderación",
+          "pending_reports_badge": "Reportes Pendientes",
+          "report_generated_by": "Reporte generado por @{{user}}",
+          "reason": "Motivo:",
+          "report_date": "Fecha del reporte: {{date}}",
+          "dismiss_report": "Desestimar Reporte",
+          "delete_post": "Eliminar Post",
+          "all_clear_title": "Todo en orden",
+          "all_clear_desc": "No hay reportes pendientes de revisión."
+        },
+        "user_management": {
+          "title": "Gestión de Usuarios",
+          "subtitle": "Administra los miembros de la comunidad Fitnation",
+          "search_placeholder": "Buscar por nombre de usuario...",
+          "search_btn": "Buscar",
+          "table_user": "Usuario",
+          "table_name": "Nombre Completo",
+          "table_bio": "Biografía",
+          "table_date": "Fecha de Registro",
+          "table_actions": "Acciones",
+          "view_profile_tooltip": "Ver Perfil",
+          "no_users_found": "No se encontraron usuarios"
+        },
+        "post_management": {
+          "title": "Gestión de Publicaciones",
+          "subtitle": "Explora y administra todas las publicaciones de la comunidad",
+          "delete_post_btn": "Eliminar Publicación",
+          "no_posts_title": "No hay publicaciones",
+          "no_posts_desc": "Aún no se ha publicado nada en la plataforma."
+        },
+        "settings": {
+          "title": "Configuración del Panel",
+          "subtitle": "Preferencias del administrador",
+          "appearance": "Apariencia",
+          "dark_mode": "Modo Oscuro",
+          "dark_mode_desc": "Ajusta la apariencia visual de FitNation",
+          "account": "Cuenta",
+          "email_label": "Email asociado",
+          "status": "Estado",
+          "status_active": "Activo (Admin)",
+          "logout_btn": "Cerrar Sesión"
+        }
       }
     }
   },
@@ -402,6 +490,25 @@ const resources = {
         "video_too_large": "Video is too large (max 50MB).",
         "image_too_large": "Image is too large (max 5MB).",
         "format_error": "Unsupported format. Use JPG, PNG, WebP, MP4 or WebM."
+      },
+      "friends": {
+        "title": "Friends",
+        "tab_friends": "My Friends",
+        "tab_following": "Following",
+        "tab_followers": "Followers",
+        "tab_discover": "Discover",
+        "mutual_badge": "Mutual Friend ⚡",
+        "follow_back": "Follow Back",
+        "unfollow": "Unfollow",
+        "follow": "Follow",
+        "view_profile": "View Profile",
+        "search_placeholder": "Search athletes by username...",
+        "no_friends": "No mutual friends yet. Follow back your followers or discover new athletes!",
+        "no_following": "You are not following any athletes yet.",
+        "no_followers": "You don't have followers yet. Share your workouts and posts to be discovered!",
+        "no_discover": "You're all caught up! You are following all registered athletes.",
+        "common_goal": "🎯 Same Goal: {{goal}}",
+        "active_now": "Active now"
       },
       "createPost": {
         "placeholder": "What's on your mind, {{name}}?",
@@ -556,7 +663,11 @@ const resources = {
         "error_internal": "⚠️ Sorry, I had a small internal issue analyzing your request. Could you try again in a few moments?",
         "error_network": "❌ Oops, it seems there are problems communicating with my servers. Check your connection or try again later.",
         "delete_tooltip": "Delete conversation",
-        "close_tooltip": "Close"
+        "close_tooltip": "Close",
+        "format_error": "Unsupported format. Use images (PNG, JPG, WEBP), PDFs, Excel (.xlsx, .xls) or TXT files.",
+        "file_too_large": "File is too large (max 5MB).",
+        "file_attached": "File attached",
+        "attach_file": "Attach file"
       },
       "gymMap": {
         "title": "Nearby Gyms"
@@ -580,6 +691,71 @@ const resources = {
         "arms": "Arms",
         "legs": "Legs",
         "core": "Core / Abs"
+      },
+      "admin": {
+        "sidebar": {
+          "dashboard": "Main Dashboard",
+          "users": "Users",
+          "stats": "Statistics",
+          "posts": "Posts",
+          "achievements": "Achievements",
+          "settings": "Settings",
+          "logout": "Log out"
+        },
+        "dashboard": {
+          "title": "Fitnation Command Center",
+          "subtitle": "Community Control Panel",
+          "registered_users": "REGISTERED USERS",
+          "new_users": "NEW USERS (weekly)",
+          "pending_reports": "PENDING REPORTS",
+          "active_challenges": "ACTIVE CHALLENGES",
+          "registered_users_chart": "Registered users",
+          "global_announcements": "Global Announcements",
+          "announcements_desc": "Send a notification to the feed of all platform users.",
+          "announcement_placeholder": "Write the announcement for the community...",
+          "launch_announcement": "Launch Announcement",
+          "moderation_inbox": "Moderation Inbox",
+          "pending_reports_badge": "Pending Reports",
+          "report_generated_by": "Report generated by @{{user}}",
+          "reason": "Reason:",
+          "report_date": "Report date: {{date}}",
+          "dismiss_report": "Dismiss Report",
+          "delete_post": "Delete Post",
+          "all_clear_title": "All clear",
+          "all_clear_desc": "There are no pending reports for review."
+        },
+        "user_management": {
+          "title": "User Management",
+          "subtitle": "Manage community members of Fitnation",
+          "search_placeholder": "Search by username...",
+          "search_btn": "Search",
+          "table_user": "User",
+          "table_name": "Full Name",
+          "table_bio": "Bio",
+          "table_date": "Registration Date",
+          "table_actions": "Actions",
+          "view_profile_tooltip": "View Profile",
+          "no_users_found": "No users found"
+        },
+        "post_management": {
+          "title": "Post Management",
+          "subtitle": "Explore and manage all community posts",
+          "delete_post_btn": "Delete Post",
+          "no_posts_title": "No posts",
+          "no_posts_desc": "Nothing has been published on the platform yet."
+        },
+        "settings": {
+          "title": "Panel Settings",
+          "subtitle": "Administrator preferences",
+          "appearance": "Appearance",
+          "dark_mode": "Dark Mode",
+          "dark_mode_desc": "Adjust the visual appearance of FitNation",
+          "account": "Account",
+          "email_label": "Associated email",
+          "status": "Status",
+          "status_active": "Active (Admin)",
+          "logout_btn": "Log Out"
+        }
       }
     }
   }

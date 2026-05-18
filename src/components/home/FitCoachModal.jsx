@@ -20,6 +20,7 @@ const FitCoachModal = ({ usuario, onClose }) => {
     const [input, setInput] = useState('');
     const [cargando, setCargando] = useState(false);
     const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
+    const [archivoAdjunto, setArchivoAdjunto] = useState(null);
     
     // Guardar mensajes en localStorage cuando cambien
     useEffect(() => {
@@ -36,29 +37,203 @@ const FitCoachModal = ({ usuario, onClose }) => {
         }
     }, [mensajes, cargando]);
 
+    const procesarExcel = (file, isExcel) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                const data = new Uint8Array(event.target.result);
+                const workbook = window.XLSX.read(data, { type: 'array' });
+                let textContent = "";
+                
+                workbook.SheetNames.forEach(sheetName => {
+                    const worksheet = workbook.Sheets[sheetName];
+                    const csv = window.XLSX.utils.sheet_to_csv(worksheet);
+                    if (csv.trim()) {
+                        textContent += `\n--- Hoja: ${sheetName} ---\n${csv}\n`;
+                    }
+                });
+
+                if (!textContent.trim()) {
+                    alert("El archivo Excel parece estar vacío.");
+                    return;
+                }
+
+                let mimeType = file.type || (file.name.endsWith('.xlsx') 
+                    ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+                    : 'application/vnd.ms-excel');
+
+                setArchivoAdjunto({
+                    fileObject: file,
+                    name: file.name,
+                    mimeType: mimeType,
+                    base64: btoa(unescape(encodeURIComponent(textContent))),
+                    isText: true,
+                    textContent: textContent,
+                    previewUrl: null
+                });
+            } catch (error) {
+                console.error("Error al procesar Excel:", error);
+                alert("No se pudo leer el archivo Excel. Asegúrate de que no esté dañado.");
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    };
+
+    const manejarSeleccionArchivo = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Validaciones (incluyendo formatos Excel .xlsx y .xls)
+        const formatosValidos = [
+            'image/png', 'image/jpeg', 'image/jpg', 'image/webp', 
+            'application/pdf', 'text/plain', 
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 
+            'application/vnd.ms-excel'
+        ];
+        
+        const isExcel = file.name.endsWith('.xlsx') || file.name.endsWith('.xls') || 
+                        file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || 
+                        file.type === 'application/vnd.ms-excel';
+
+        if (!formatosValidos.includes(file.type) && !isExcel) {
+            alert(t('fitCoach.format_error'));
+            e.target.value = '';
+            return;
+        }
+
+        const sizeLimit = 5 * 1024 * 1024; // 5MB
+        if (file.size > sizeLimit) {
+            alert(t('fitCoach.file_too_large'));
+            e.target.value = '';
+            return;
+        }
+
+        // Si es Excel, cargamos XLSX dinámicamente si no existe y parseamos
+        if (isExcel) {
+            if (!window.XLSX) {
+                const script = document.createElement('script');
+                script.src = "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";
+                script.async = true;
+                script.onload = () => {
+                    procesarExcel(file, isExcel);
+                };
+                script.onerror = () => {
+                    alert("Error al cargar la librería de lectura de Excel. Revisa tu conexión a internet.");
+                };
+                document.head.appendChild(script);
+            } else {
+                procesarExcel(file, isExcel);
+            }
+            e.target.value = '';
+            return;
+        }
+
+        const reader = new FileReader();
+        const isImage = file.type.startsWith('image/');
+        const isText = file.type === 'text/plain';
+
+        // Determinar MIME type correcto para Excel si el navegador lo devuelve vacío
+        let mimeType = file.type;
+        if (!mimeType && isExcel) {
+            mimeType = file.name.endsWith('.xlsx') 
+                ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+                : 'application/vnd.ms-excel';
+        }
+
+        if (isText) {
+            const textReader = new FileReader();
+            textReader.onload = (event) => {
+                const textContent = event.target.result;
+                setArchivoAdjunto({
+                    fileObject: file,
+                    name: file.name,
+                    mimeType: mimeType || 'text/plain',
+                    base64: btoa(unescape(encodeURIComponent(textContent))),
+                    isText: true,
+                    textContent,
+                    previewUrl: null
+                });
+            };
+            textReader.readAsText(file);
+        } else {
+            reader.onload = (event) => {
+                const dataUrl = event.target.result;
+                const base64Data = dataUrl.split(',')[1];
+                setArchivoAdjunto({
+                    fileObject: file,
+                    name: file.name,
+                    mimeType: mimeType || 'application/octet-stream',
+                    base64: base64Data,
+                    isText: false,
+                    previewUrl: isImage ? dataUrl : null
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        e.target.value = '';
+    };
+
+    const manejarQuitarArchivo = () => {
+        setArchivoAdjunto(null);
+    };
+
     const manejarEnvio = async (e) => {
         if (e) e.preventDefault();
-        if (!input.trim() || cargando) return;
+        if ((!input.trim() && !archivoAdjunto) || cargando) return;
 
-        const mensajeUsuario = { rol: 'user', texto: input };
+        const mensajeUsuario = { 
+            rol: 'user', 
+            texto: input,
+            archivo: archivoAdjunto ? {
+                name: archivoAdjunto.name,
+                mimeType: archivoAdjunto.mimeType,
+                previewUrl: archivoAdjunto.previewUrl,
+                size: archivoAdjunto.fileObject.size
+            } : null
+        };
+
         setMensajes(prev => [...prev, mensajeUsuario]);
+        
+        const promptEnvio = input;
+        const archivoEnvio = archivoAdjunto;
         setInput('');
+        setArchivoAdjunto(null);
         setCargando(true);
 
         try {
-            // Aseguramos que pasamos los datos que el backend espera
             const userData = {
                 username: usuario?.username || usuario?.user_metadata?.nombre_usuario || 'Atleta',
                 objetivo: usuario?.fitness_goal || usuario?.biografia || 'mejorar su salud'
             };
 
+            // Para archivos de texto (como TXT o el Excel pre-procesado a texto CSV),
+            // lo concatenamos directamente al prompt para que la lectura por la IA sea
+            // 100% fiable, inmediata y no dependa de si el usuario ha desplegado la Edge Function
+            let promptFinal = promptEnvio;
+            if (archivoEnvio && archivoEnvio.isText && archivoEnvio.textContent) {
+                promptFinal = `${promptEnvio}\n\n[Contenido del archivo Excel/Texto "${archivoEnvio.name}" extraído y formateado]:\n${archivoEnvio.textContent}`;
+            }
+
+            const body = {
+                prompt: promptFinal || t('fitCoach.file_attached'),
+                userData
+            };
+
+            if (archivoEnvio && !archivoEnvio.isText) {
+                body.file = {
+                    base64: archivoEnvio.base64,
+                    mimeType: archivoEnvio.mimeType,
+                    name: archivoEnvio.name
+                };
+            }
+
             const { data, error: invokeError } = await supabase.functions.invoke('fit-coach', {
-                body: { prompt: input, userData }
+                body
             });
 
             if (invokeError) throw invokeError;
             
-            // Si el backend devuelve un error específico en el JSON
             if (data.error) {
                 console.error("Error de FitCoach (backend):", data.error);
                 setMensajes(prev => [...prev, { rol: 'assistant', texto: t('fitCoach.error_internal') }]);
@@ -161,17 +336,53 @@ const FitCoachModal = ({ usuario, onClose }) => {
                             className={`d-flex ${m.rol === 'user' ? 'justify-content-end' : 'justify-content-start'}`}
                         >
                             <div 
-                                className={`p-3 rounded-4 shadow-sm`}
-                                style={{ 
-                                    maxWidth: '85%',
-                                    backgroundColor: m.rol === 'user' ? '#0d6efd' : 'var(--fn-card-bg)',
-                                    color: m.rol === 'user' ? 'white' : 'var(--fn-text-main)',
-                                    border: m.rol === 'user' ? 'none' : '1px solid var(--fn-border)',
-                                    fontSize: '0.95rem',
-                                    lineHeight: '1.4'
-                                }}
+                                className="d-flex flex-column gap-1"
+                                style={{ maxWidth: '85%' }}
                             >
-                                {m.texto}
+                                {m.archivo && (
+                                    <div 
+                                        className="p-2 mb-1 rounded-3 shadow-sm d-flex align-items-center gap-2"
+                                        style={{ 
+                                            backgroundColor: m.rol === 'user' ? '#1864ab' : 'var(--fn-hover)',
+                                            color: m.rol === 'user' ? 'white' : 'var(--fn-text-main)',
+                                            border: m.rol === 'user' ? 'none' : '1px solid var(--fn-border)',
+                                            fontSize: '0.85rem'
+                                        }}
+                                    >
+                                        {m.archivo.previewUrl ? (
+                                            <img 
+                                                src={m.archivo.previewUrl} 
+                                                alt={m.archivo.name} 
+                                                className="rounded-2" 
+                                                style={{ width: '45px', height: '45px', objectFit: 'cover' }} 
+                                            />
+                                        ) : (
+                                            <div className="rounded-2 bg-black bg-opacity-25 d-flex align-items-center justify-content-center text-white" style={{ width: '45px', height: '45px', fontSize: '1.25rem' }}>
+                                                {m.archivo.mimeType === 'application/pdf' ? '📄' : 
+                                                 (m.archivo.mimeType?.includes('sheet') || m.archivo.mimeType?.includes('excel') || m.archivo.name.endsWith('.xlsx') || m.archivo.name.endsWith('.xls')) ? '📊' : '📝'}
+                                            </div>
+                                        )}
+                                        <div className="overflow-hidden" style={{ minWidth: '100px' }}>
+                                            <span className="d-block text-truncate fw-medium">{m.archivo.name}</span>
+                                            <small className="opacity-75">{(m.archivo.size / 1024).toFixed(1)} KB</small>
+                                        </div>
+                                    </div>
+                                )}
+                                
+                                {m.texto && (
+                                    <div 
+                                        className={`p-3 rounded-4 shadow-sm`}
+                                        style={{ 
+                                            backgroundColor: m.rol === 'user' ? '#0d6efd' : 'var(--fn-card-bg)',
+                                            color: m.rol === 'user' ? 'white' : 'var(--fn-text-main)',
+                                            border: m.rol === 'user' ? 'none' : '1px solid var(--fn-border)',
+                                            fontSize: '0.95rem',
+                                            lineHeight: '1.4'
+                                        }}
+                                    >
+                                        {m.texto}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     ))}
@@ -200,29 +411,90 @@ const FitCoachModal = ({ usuario, onClose }) => {
                     className="p-3 border-top"
                     style={{ background: 'var(--fn-card-bg)', borderTopColor: 'var(--fn-border)!important' }}
                 >
-                    <div className="input-group">
+                    {/* Visualización del archivo adjunto */}
+                    {archivoAdjunto && (
+                        <div className="d-flex align-items-center justify-content-between p-2 mb-2 rounded-3 border" style={{ backgroundColor: 'var(--fn-hover)', borderColor: 'var(--fn-border)' }}>
+                            <div className="d-flex align-items-center gap-2 overflow-hidden" style={{ maxWidth: '85%' }}>
+                                {archivoAdjunto.previewUrl ? (
+                                    <img 
+                                        src={archivoAdjunto.previewUrl} 
+                                        alt="preview" 
+                                        className="rounded-2" 
+                                        style={{ width: '40px', height: '40px', objectFit: 'cover' }} 
+                                    />
+                                ) : (
+                                    <div className="rounded-2 bg-secondary d-flex align-items-center justify-content-center text-white" style={{ width: '40px', height: '40px', fontSize: '1.2rem' }}>
+                                        {archivoAdjunto.mimeType === 'application/pdf' ? '📄' : 
+                                         (archivoAdjunto.mimeType?.includes('sheet') || archivoAdjunto.mimeType?.includes('excel') || archivoAdjunto.name.endsWith('.xlsx') || archivoAdjunto.name.endsWith('.xls')) ? '📊' : '📝'}
+                                    </div>
+                                )}
+                                <div className="text-truncate">
+                                    <small className="d-block fw-semibold text-truncate" style={{ color: 'var(--fn-text-main)', fontSize: '0.85rem' }}>{archivoAdjunto.name}</small>
+                                    <small style={{ color: 'var(--fn-text-muted)', fontSize: '0.75rem' }}>{(archivoAdjunto.fileObject.size / 1024).toFixed(1)} KB</small>
+                                </div>
+                            </div>
+                            <button 
+                                type="button" 
+                                className="btn btn-sm btn-link text-danger p-0 border-0 bg-transparent" 
+                                onClick={manejarQuitarArchivo}
+                                style={{ textDecoration: 'none' }}
+                            >
+                                <i className="bi bi-x-circle-fill fs-5"></i>
+                            </button>
+                        </div>
+                    )}
+
+                    <div className="input-group align-items-center">
+                        <label 
+                            htmlFor="fitcoach-file-upload" 
+                            className="btn btn-outline-secondary border-0 d-flex align-items-center justify-content-center m-0"
+                            style={{ 
+                                backgroundColor: 'var(--fn-hover)', 
+                                borderTopLeftRadius: '12px', 
+                                borderBottomLeftRadius: '12px',
+                                height: '45px', 
+                                width: '45px',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
+                            }}
+                            title={t('fitCoach.attach_file')}
+                        >
+                            <i className="bi bi-paperclip fs-5" style={{ color: 'var(--fn-text-muted)' }}></i>
+                            <input 
+                                type="file" 
+                                id="fitcoach-file-upload" 
+                                onChange={manejarSeleccionArchivo} 
+                                accept=".png,.jpg,.jpeg,.webp,.pdf,.txt,.xlsx,.xls"
+                                style={{ display: 'none' }}
+                                disabled={cargando}
+                            />
+                        </label>
                         <input 
                             type="text" 
-                            className="form-control-custom border-0"
+                            className="form-control border-0"
                             placeholder={t('fitCoach.placeholder')}
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             disabled={cargando}
                             style={{ 
                                 backgroundColor: 'var(--fn-hover)',
-                                borderRadius: '12px 0 0 12px',
-                                paddingLeft: '20px'
+                                color: 'var(--fn-text-main)',
+                                borderLeft: '1px solid var(--fn-border)',
+                                height: '45px',
+                                paddingLeft: '15px'
                             }}
                         />
                         <button 
-                            className="btn btn-primary"
+                            className="btn btn-primary d-flex align-items-center justify-content-center"
                             type="submit"
-                            disabled={cargando || !input.trim()}
+                            disabled={cargando || (!input.trim() && !archivoAdjunto)}
                             style={{ 
                                 background: 'linear-gradient(90deg, #0d6efd, #198754)',
                                 border: 'none',
-                                borderRadius: '0 12px 12px 0',
-                                width: '60px'
+                                borderTopRightRadius: '12px',
+                                borderBottomRightRadius: '12px',
+                                width: '60px',
+                                height: '45px'
                             }}
                         >
                             {cargando ? (
