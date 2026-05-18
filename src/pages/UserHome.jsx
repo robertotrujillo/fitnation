@@ -23,6 +23,26 @@ const UserHome = () => {
     const [siguiendoIds, setSiguiendoIds] = useState([]);
     const [contactos, setContactos] = useState([]);
 
+    const ads = [
+        {
+            image: '/ad_protein.png',
+            titleKey: 'userHome.premium_protein',
+            descKey: 'userHome.premium_desc'
+        },
+        {
+            image: '/ad_wear.png',
+            titleKey: 'userHome.wear_title',
+            descKey: 'userHome.wear_desc'
+        },
+        {
+            image: '/ad_tracker.png',
+            titleKey: 'userHome.tracker_title',
+            descKey: 'userHome.tracker_desc'
+        }
+    ];
+
+    const [adIndex, setAdIndex] = useState(0);
+
     const [heatmapData, setHeatmapData] = useState({});
     const [modalEntreno, setModalEntreno] = useState(false);
     const [modalGyms, setModalGyms] = useState(false);
@@ -91,6 +111,13 @@ const UserHome = () => {
         cargarHeatmap();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [usuario.id]);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setAdIndex((prev) => (prev + 1) % ads.length);
+        }, 4000);
+        return () => clearInterval(interval);
+    }, []);
 
     const manejarCrearPublicacion = async (e) => {
         // Permitir envío con click en un botón (el evento no tendría key)
@@ -425,10 +452,77 @@ const UserHome = () => {
 
                 <div className="right-sidebar">
                     <h6 className="text-secondary fw-bold mb-3">{t('userHome.advertising')}</h6>
-                    <div className="mb-4">
-                        <div style={{ height: '150px', background: 'var(--fn-hover)', borderRadius: '8px', marginBottom: '8px', border: '1px solid var(--fn-border)' }}></div>
-                        <small className="fw-bold" style={{ color: 'var(--fn-text-main)' }}>{t('userHome.premium_protein')}</small>
-                        <p className="small" style={{ color: 'var(--fn-text-muted)' }}>{t('userHome.premium_desc')}</p>
+                    <div 
+                        className="mb-4 ad-card-container" 
+                        style={{ 
+                            borderRadius: '12px', 
+                            border: '1px solid var(--fn-border)',
+                            backgroundColor: 'var(--fn-card-bg)',
+                            padding: '12px',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                            position: 'relative',
+                            overflow: 'hidden'
+                        }}
+                    >
+                        <div style={{ position: 'relative', height: '150px', borderRadius: '8px', overflow: 'hidden', marginBottom: '10px' }}>
+                            {ads.map((ad, idx) => (
+                                <img
+                                    key={idx}
+                                    src={ad.image}
+                                    alt="Ad"
+                                    className="w-100 h-100 object-fit-cover"
+                                    style={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        opacity: adIndex === idx ? 1 : 0,
+                                        transform: adIndex === idx ? 'scale(1)' : 'scale(1.05)',
+                                        transition: 'opacity 0.8s ease-in-out, transform 0.8s ease-in-out',
+                                        zIndex: adIndex === idx ? 1 : 0
+                                    }}
+                                />
+                            ))}
+                        </div>
+                        
+                        <div style={{ minHeight: '65px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                            {ads.map((ad, idx) => (
+                                <div
+                                    key={idx}
+                                    style={{
+                                        display: adIndex === idx ? 'block' : 'none',
+                                        animation: 'fadeIn 0.5s ease-in-out'
+                                    }}
+                                >
+                                    <small className="fw-bold d-block mb-1" style={{ color: 'var(--fn-text-main)', fontSize: '0.9rem' }}>
+                                        {t(ad.titleKey)}
+                                    </small>
+                                    <p className="small mb-0" style={{ color: 'var(--fn-text-muted)', fontSize: '0.8rem', lineHeight: '1.25' }}>
+                                        {t(ad.descKey)}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Dot Indicators */}
+                        <div className="d-flex justify-content-center gap-2 mt-2">
+                            {ads.map((_, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => setAdIndex(idx)}
+                                    style={{
+                                        width: adIndex === idx ? '18px' : '6px',
+                                        height: '6px',
+                                        borderRadius: '3px',
+                                        backgroundColor: adIndex === idx ? '#0d6efd' : 'var(--fn-border)',
+                                        border: 'none',
+                                        padding: 0,
+                                        cursor: 'pointer',
+                                        transition: 'all 0.3s ease'
+                                    }}
+                                    aria-label={`Slide ${idx + 1}`}
+                                />
+                            ))}
+                        </div>
                     </div>
 
                     <h6 className="fw-bold mb-3" style={{ color: 'var(--fn-text-muted)' }}>{t('userHome.contacts')}</h6>

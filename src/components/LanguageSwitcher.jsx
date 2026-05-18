@@ -1,35 +1,56 @@
-import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../context/LanguageContext';
+
+const LANGS = {
+    es: { flag: '🇪🇸', next: 'en', nextLabel: 'Switch to English' },
+    en: { flag: '🇬🇧', next: 'es', nextLabel: 'Cambiar a Español' },
+};
 
 const LanguageSwitcher = () => {
-    const { i18n } = useTranslation();
-
-    const toggleLanguage = () => {
-        const newLang = i18n.language.startsWith('es') ? 'en' : 'es';
-        i18n.changeLanguage(newLang);
-    };
+    const { language, changeLanguage } = useLanguage();
+    const current = LANGS[language] ?? LANGS['es'];
 
     return (
-        <button 
-            onClick={toggleLanguage}
-            className="btn rounded-circle d-flex align-items-center justify-content-center p-0 shadow-lg"
-            style={{ 
+        <button
+            id="global-language-switcher"
+            onClick={() => changeLanguage(current.next)}
+            title={current.nextLabel}
+            aria-label={current.nextLabel}
+            style={{
                 position: 'fixed',
-                bottom: '20px',
-                right: '20px',
-                width: '50px', 
-                height: '50px', 
-                backgroundColor: '#2ecc71', 
+                bottom: '24px',
+                right: '24px',
+                width: '52px',
+                height: '52px',
+                borderRadius: '50%',
                 border: 'none',
-                color: '#fff',
-                transition: 'all 0.3s ease',
                 cursor: 'pointer',
-                zIndex: 9999
+                zIndex: 9999,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '1.55rem',
+                lineHeight: 1,
+                background: 'linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%)',
+                boxShadow: '0 4px 16px rgba(13,110,253,0.40)',
+                transition: 'transform 0.18s ease, box-shadow 0.18s ease',
+                userSelect: 'none',
             }}
-            title={i18n.language.startsWith('es') ? 'Cambiar a Inglés' : 'Switch to Spanish'}
+            onMouseEnter={e => {
+                e.currentTarget.style.transform = 'scale(1.12)';
+                e.currentTarget.style.boxShadow = '0 6px 22px rgba(13,110,253,0.55)';
+            }}
+            onMouseLeave={e => {
+                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.boxShadow = '0 4px 16px rgba(13,110,253,0.40)';
+            }}
+            onMouseDown={e => {
+                e.currentTarget.style.transform = 'scale(0.95)';
+            }}
+            onMouseUp={e => {
+                e.currentTarget.style.transform = 'scale(1.12)';
+            }}
         >
-            <span className="fw-bold" style={{ fontSize: '16px' }}>
-                {i18n.language.startsWith('es') ? 'ES' : 'EN'}
-            </span>
+            {current.flag}
         </button>
     );
 };

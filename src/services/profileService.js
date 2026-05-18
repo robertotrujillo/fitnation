@@ -308,5 +308,25 @@ export const servicioPerfil = {
             console.error("Error guardando tema:", error);
             return false;
         }
+    },
+
+    /**
+     * Guarda la preferencia de idioma del usuario en la BD.
+     * @param {string} userId
+     * @param {string} lang - 'es' o 'en'
+     */
+    guardarIdioma: async (userId, lang) => {
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .update({ language: lang })
+                .eq('id', userId);
+
+            if (error) throw error;
+            return true;
+        } catch (error) {
+            console.error("Error guardando idioma:", error);
+            return false;
+        }
     }
 };
